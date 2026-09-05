@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket Test</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>TravelMate Chat Test</h2>
+  <input id="token" placeholder="Paste access token here" style="width: 500px;" />
+  <input id="tripId" placeholder="Trip ID" style="width: 300px;" />
+  <button onclick="connect()">Connect & Join Room</button>
+  <br /><br />
+  <input id="messageInput" placeholder="Type a message" style="width: 400px;" />
+  <button onclick="sendMessage()">Send</button>
+  <div id="log" style="margin-top: 20px; white-space: pre-wrap; font-family: monospace;"></div>
+
+  <script>
+    let socket;
+    let currentTripId;
+
+    function log(msg) {
+      document.getElementById('log').innerText += msg + '\n';
+    }
+
+    function connect() {
+      const token = document.getElementById('token').value;
+      currentTripId = document.getElementById('tripId').value;
+
+      socket = io('http://localhost:5000', {
+        auth: { token }
+      });
+
+      socket.on('connect', () => log('✅ Connected: ' + socket.id));
+      socket.on('connect_error', (err) => log('❌ Connection error: ' + err.message));
+      socket.on('joined-room', (data) => log('✅ Joined room for trip: ' + data.tripId));
+      socket.on('error', (data) => log('❌ Error: ' + data.message));
+      socket.on('new-message', (msg) => log('💬 ' + msg.sender.name + ': ' + msg.content));
+
+      socket.emit('join-trip-room', currentTripId);
+    }
+
+    function sendMessage() {
+      const content = document.getElementById('messageInput').value;
+      socket.emit('send-message', { tripId: currentTripId, content });
+      document.getElementById('messageInput').value = '';
+    }
+  </script>
+</body>
+</html>
