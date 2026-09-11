@@ -8,7 +8,7 @@ import PageTransition from '../components/PageTransition';
 
 const SkeletonCard = () => (
   <div className="bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-2xl overflow-hidden animate-pulse">
-    <div className="h-24 bg-[var(--color-bg-secondary)]" />
+    <div className="h-28 bg-[var(--color-bg-secondary)]" />
     <div className="p-5 space-y-3">
       <div className="h-4 bg-[var(--color-bg-secondary)] rounded w-3/4" />
       <div className="h-3 bg-[var(--color-bg-secondary)] rounded w-1/2" />
@@ -31,9 +31,25 @@ const Discover = () => {
   return (
     <PageTransition>
       <div className="min-h-screen bg-[var(--color-bg-primary)]">
-        <div className="bg-[var(--color-bg-secondary)] border-b border-[var(--color-border)] px-6 py-12">
-          <div className="max-w-5xl mx-auto text-center">
-            <h1 className="text-3xl font-semibold text-[var(--color-text-primary)] tracking-tight">
+        <div className="relative overflow-hidden border-b border-[var(--color-border)] px-6 py-14 grain">
+          <div
+            className="absolute inset-0 opacity-90"
+            style={{ background: 'linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%)' }}
+          />
+          <div
+            className="absolute -top-32 left-1/3 w-[420px] h-[420px] rounded-full opacity-25 blur-3xl pointer-events-none drift"
+            style={{ background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 70%)' }}
+          />
+          <div
+            className="absolute -top-20 right-10 w-[280px] h-[280px] rounded-full opacity-20 blur-3xl pointer-events-none drift"
+            style={{ background: 'radial-gradient(circle, var(--color-coral) 0%, transparent 70%)', animationDelay: '-4s' }}
+          />
+
+          <div className="relative max-w-5xl mx-auto text-center">
+            <span className="text-xs font-medium tracking-wide text-[var(--color-coral)] bg-[var(--color-coral-soft)] px-3 py-1 rounded-full">
+              Open trips
+            </span>
+            <h1 className="font-display text-4xl md:text-5xl font-semibold text-[var(--color-text-primary)] tracking-tight mt-4">
               Find your next trip
             </h1>
             <p className="text-sm text-[var(--color-text-secondary)] mt-2">
@@ -47,7 +63,7 @@ const Discover = () => {
                   placeholder="Where do you want to go?"
                   value={filters.destination}
                   onChange={(e) => handleFilterChange('destination', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm placeholder:text-[var(--color-text-muted)] shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
                 />
               </div>
               <div className="relative sm:w-44">
@@ -57,7 +73,7 @@ const Discover = () => {
                   placeholder="Max budget"
                   value={filters.maxBudget}
                   onChange={(e) => handleFilterChange('maxBudget', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm placeholder:text-[var(--color-text-muted)] shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent transition-all"
                 />
               </div>
             </div>

@@ -55,43 +55,54 @@ const TripDetail = () => {
   return (
     <PageTransition>
       <div className="min-h-screen bg-[var(--color-bg-primary)]">
-        <div className="max-w-3xl mx-auto px-6 py-10">
-          <Link to="/discover" className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">
-            ← Back to discover
-          </Link>
+        <div className="relative overflow-hidden border-b border-[var(--color-border)] grain">
+          <div
+            className="absolute inset-0 opacity-90"
+            style={{ background: 'linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%)' }}
+          />
+          <div className="relative max-w-3xl mx-auto px-6 pt-10 pb-8">
+            <Link to="/discover" className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors">
+              &larr; Back to discover
+            </Link>
 
-          <div className="mt-6 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-sm text-[var(--color-text-muted)]">{trip.source} → {trip.destination}</p>
-              <h1 className="text-2xl md:text-3xl font-semibold text-[var(--color-text-primary)] mt-1">
-                {trip.title}
-              </h1>
+            <div className="mt-6 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium tracking-wide text-[var(--color-accent)]">
+                  {trip.source} <span className="text-[var(--color-text-muted)]">&rarr;</span> {trip.destination}
+                </p>
+                <h1 className="font-display text-3xl md:text-4xl font-semibold text-[var(--color-text-primary)] mt-1">
+                  {trip.title}
+                </h1>
+              </div>
+
+              {myMatch && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  className="shrink-0 text-center bg-[var(--color-coral-soft)] rounded-xl px-4 py-3 border border-[var(--color-coral)]/20"
+                >
+                  <p className="text-xl font-semibold text-[var(--color-coral)]">{myMatch.compatibility}%</p>
+                  <p className="text-[10px] text-[var(--color-coral)] uppercase tracking-wide">match</p>
+                </motion.div>
+              )}
             </div>
 
-            {myMatch && (
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                className="shrink-0 text-center bg-[var(--color-accent-soft)] rounded-xl px-4 py-3"
-              >
-                <p className="text-xl font-semibold text-[var(--color-accent)]">{myMatch.compatibility}%</p>
-                <p className="text-[10px] text-[var(--color-accent)] uppercase tracking-wide">match</p>
-              </motion.div>
+            {myMatch?.reasons?.length > 0 && (
+              <div className="flex gap-1.5 flex-wrap mt-3">
+                {myMatch.reasons.map((reason) => (
+                  <span key={reason} className="text-[11px] text-[var(--color-accent)] bg-[var(--color-accent-soft)] px-2.5 py-1 rounded-full">
+                    &#10003; {reason}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
+        </div>
 
-          {myMatch?.reasons?.length > 0 && (
-            <div className="flex gap-1.5 flex-wrap mt-3">
-              {myMatch.reasons.map((reason) => (
-                <span key={reason} className="text-[11px] text-[var(--color-accent)] bg-[var(--color-accent-soft)] px-2.5 py-1 rounded-full">
-                  ✓ {reason}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 p-5 bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-2xl">
+        <div className="max-w-3xl mx-auto px-6 pb-10">
+          {/* ticket-stub info row: perforated edge nods to a boarding pass */}
+          <div className="relative -mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 p-5 bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-2xl shadow-lg shadow-black/5">
             <div>
               <WalletIcon className="text-[var(--color-text-muted)] mb-1.5" />
               <p className="text-sm font-medium text-[var(--color-text-primary)]">₹{trip.budgetPerPerson.toLocaleString()}</p>
@@ -119,7 +130,7 @@ const TripDetail = () => {
           </div>
 
           {trip.description && (
-            <div className="mt-6">
+            <div className="mt-8">
               <h3 className="text-sm font-medium text-[var(--color-text-primary)] mb-2">About this trip</h3>
               <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{trip.description}</p>
             </div>
@@ -135,7 +146,7 @@ const TripDetail = () => {
             </div>
           )}
 
-          <div className="flex items-center gap-3 mt-8 pt-6 border-t border-[var(--color-border)]">
+          <div className="flex items-center gap-3 mt-8 pt-6 border-t border-dashed border-[var(--color-border)]">
             <div className="w-9 h-9 rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)] text-sm font-semibold flex items-center justify-center">
               {trip.creator?.name?.[0]?.toUpperCase() || '?'}
             </div>
@@ -149,7 +160,7 @@ const TripDetail = () => {
             {!user && (
               <Link
                 to="/login"
-                className="block text-center w-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white py-3 rounded-xl text-sm font-medium transition-colors"
+                className="block text-center w-full bg-[var(--color-coral)] hover:brightness-95 text-white py-3 rounded-xl text-sm font-medium transition-all shadow-md shadow-[var(--color-coral)]/20"
               >
                 Log in to request to join
               </Link>
@@ -182,7 +193,7 @@ const TripDetail = () => {
                 <button
                   onClick={() => joinMutation.mutate()}
                   disabled={joinMutation.isPending}
-                  className="w-full mt-3 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] disabled:opacity-60 text-white py-3 rounded-xl text-sm font-medium transition-colors"
+                  className="w-full mt-3 bg-[var(--color-coral)] hover:brightness-95 disabled:opacity-60 text-white py-3 rounded-xl text-sm font-medium transition-all shadow-md shadow-[var(--color-coral)]/20"
                 >
                   {joinMutation.isPending ? 'Sending request...' : 'Request to join'}
                 </button>

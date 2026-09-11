@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CalendarIcon, WalletIcon, TransportIcon, UsersIcon } from './Icons';
 
+// Ocean, sunset & sand — pulled from the same palette as the rest of the app,
+// never arbitrary hues, so a grid of cards still reads as one brand.
 const GRADIENTS = [
-  'linear-gradient(135deg, #6b5b95 0%, #8a9fd6 100%)',
-  'linear-gradient(135deg, #4a7c59 0%, #6b9b7a 100%)',
-  'linear-gradient(135deg, #b8860b 0%, #d4a94f 100%)',
-  'linear-gradient(135deg, #5a7ba0 0%, #7fa8c9 100%)',
-  'linear-gradient(135deg, #a05a7b 0%, #c98aa8 100%)',
+  'linear-gradient(135deg, #0e7c7b 0%, #17a398 100%)',
+  'linear-gradient(135deg, #ff6b4a 0%, #ff9166 100%)',
+  'linear-gradient(135deg, #f2b134 0%, #e89a1c 100%)',
+  'linear-gradient(135deg, #0a5f5e 0%, #1c8b89 100%)',
+  'linear-gradient(135deg, #c8503a 0%, #ff6b4a 100%)',
 ];
 
 const gradientFor = (str) => {
@@ -23,24 +25,31 @@ const TripCard = ({ trip }) => {
     <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.15 }}>
       <Link
         to={`/trips/${trip._id}`}
-        className="group block bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-2xl overflow-hidden hover:shadow-lg hover:border-[var(--color-accent)]/40 transition-all duration-200"
+        className="group block bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-black/5 hover:border-[var(--color-accent)]/40 transition-all duration-200"
       >
         <div
-          className="h-24 relative flex items-end p-4"
+          className="h-28 relative flex items-end p-4 overflow-hidden"
           style={{ background: gradientFor(trip.destination) }}
         >
-          <div className="absolute inset-0 bg-black/10" />
-          <span className="relative text-white/90 text-xs font-medium tracking-wide">
-            {trip.source} → {trip.destination}
-          </span>
+          <div
+            className="absolute inset-0 opacity-25 map-dots text-white"
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
+
+          {/* postmark-style seat badge, stamped in the corner */}
           <span
-            className={`absolute top-3 right-3 text-[11px] font-medium px-2.5 py-1 rounded-full backdrop-blur-sm ${
+            className={`absolute top-3 right-3 text-[11px] font-medium px-2.5 py-1 rounded-full border backdrop-blur-sm ${
               isAlmostFull
-                ? 'bg-white/90 text-[var(--color-danger)]'
-                : 'bg-white/25 text-white'
+                ? 'bg-white/95 text-[var(--color-danger)] border-white'
+                : 'bg-white/20 text-white border-white/40'
             }`}
           >
             {seatsLeft} {seatsLeft === 1 ? 'seat' : 'seats'} left
+          </span>
+
+          <span className="relative font-display text-white text-base tracking-tight">
+            {trip.source} <span className="opacity-70">&rarr;</span> {trip.destination}
           </span>
         </div>
 
@@ -81,7 +90,7 @@ const TripCard = ({ trip }) => {
             </div>
           )}
 
-          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-[var(--color-border)]">
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-dashed border-[var(--color-border)]">
             <div className="w-6 h-6 rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)] text-[10px] font-semibold flex items-center justify-center">
               {trip.creator?.name?.[0]?.toUpperCase() || '?'}
             </div>

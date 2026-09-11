@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import Logo from '../components/Logo';
 import PageTransition from '../components/PageTransition';
+import RouteMotif from '../components/RouteMotif';
 
 const SunIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -17,15 +18,25 @@ const MoonIcon = () => (
   </svg>
 );
 
+const TAGS = [
+  { label: 'Matched by compatibility', note: 'Budget, style & interests aligned', code: 'MTC' },
+  { label: 'Plan together, live', note: 'Chat, itinerary & polls in one place', code: 'PLN' },
+  { label: 'Split fairly', note: 'Automatic, minimal-transaction settlements', code: 'SPL' },
+];
+
 const Landing = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-[var(--color-bg-primary)] relative overflow-hidden">
+      <div className="min-h-screen bg-[var(--color-bg-primary)] relative overflow-hidden grain">
         <div
-          className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl pointer-events-none"
+          className="absolute -top-40 -left-32 w-[520px] h-[520px] rounded-full opacity-30 blur-3xl pointer-events-none drift"
           style={{ background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 70%)' }}
+        />
+        <div
+          className="absolute top-10 -right-24 w-[420px] h-[420px] rounded-full opacity-25 blur-3xl pointer-events-none drift"
+          style={{ background: 'radial-gradient(circle, var(--color-coral) 0%, transparent 70%)', animationDelay: '-6s' }}
         />
 
         <nav className="relative flex items-center justify-between px-8 py-6 max-w-6xl mx-auto w-full">
@@ -62,25 +73,29 @@ const Landing = () => {
           </div>
         </nav>
 
-        <main className="relative flex-1 flex flex-col items-center justify-center text-center px-6 max-w-2xl mx-auto pt-24 pb-32">
-          <span className="text-xs font-medium tracking-wide uppercase text-[var(--color-accent)] bg-[var(--color-accent-soft)] px-3 py-1 rounded-full mb-6">
+        <main className="relative flex-1 flex flex-col items-center text-center px-6 max-w-2xl mx-auto pt-16 pb-28">
+          <span className="text-xs font-medium tracking-wide text-[var(--color-coral)] bg-[var(--color-coral-soft)] px-3 py-1 rounded-full mb-8">
             Compatibility-based travel
           </span>
 
-          <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-[var(--color-text-primary)] leading-[1.1]">
+          <h1 className="font-display text-5xl md:text-7xl font-semibold tracking-tight text-[var(--color-text-primary)] leading-[1.05]">
             Find your people.
             <br />
-            <span className="text-[var(--color-accent)]">Plan together.</span>
+            Plan together.
           </h1>
 
-          <p className="mt-6 text-lg text-[var(--color-text-secondary)] max-w-md leading-relaxed">
+          <div className="w-full max-w-md text-[var(--color-border)]">
+            <RouteMotif className="w-full h-16 my-4" />
+          </div>
+
+          <p className="text-lg text-[var(--color-text-secondary)] max-w-md leading-relaxed">
             Discover compatible travel companions, plan trips together, and travel with confidence — all in one place.
           </p>
 
           <div className="mt-9 flex items-center gap-4">
             <Link
               to="/register"
-              className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors shadow-sm"
+              className="bg-[var(--color-coral)] hover:brightness-95 text-white px-6 py-3 rounded-lg text-sm font-medium transition-all shadow-md shadow-[var(--color-coral)]/20"
             >
               Start planning
             </Link>
@@ -92,21 +107,26 @@ const Landing = () => {
             </Link>
           </div>
 
-          <div className="mt-16 grid grid-cols-3 gap-8 text-left max-w-xl w-full">
-            {[
-              { title: 'Matched by compatibility', desc: 'Budget, style, and interests aligned' },
-              { title: 'Plan together, live', desc: 'Chat, itinerary, and polls in one place' },
-              { title: 'Split fairly', desc: 'Automatic, minimal-transaction settlements' },
-            ].map((f) => (
-              <div key={f.title}>
-                <p className="text-sm font-medium text-[var(--color-text-primary)]">{f.title}</p>
-                <p className="text-xs text-[var(--color-text-muted)] mt-1 leading-relaxed">{f.desc}</p>
+          <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left max-w-xl w-full">
+            {TAGS.map((f) => (
+              <div
+                key={f.code}
+                className="relative flex items-start gap-3 bg-[var(--color-bg-elevated)] border border-dashed border-[var(--color-border)] rounded-lg py-3 pl-3 pr-4"
+              >
+                <span className="mt-0.5 w-2.5 h-2.5 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-primary)] shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">{f.label}</p>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-1 leading-relaxed">{f.note}</p>
+                </div>
+                <span className="absolute top-2 right-2.5 text-[10px] font-medium tracking-wide text-[var(--color-text-muted)]">
+                  {f.code}
+                </span>
               </div>
             ))}
           </div>
         </main>
 
-        <footer className="relative text-center py-6 text-xs text-[var(--color-text-muted)]">
+        <footer className="relative text-center py-6 text-xs text-[var(--color-text-muted)] border-t border-[var(--color-border)]">
           TravelMate — built for travelers, by a traveler.
         </footer>
       </div>

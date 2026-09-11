@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import Input from '../components/Input';
 import Logo from '../components/Logo';
 import PageTransition from '../components/PageTransition';
+import RouteMotif from '../components/RouteMotif';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -32,14 +33,33 @@ const Register = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center px-6">
-        <div className="w-full max-w-sm">
-          <Link to="/" className="flex justify-center mb-8">
-            <Logo />
-          </Link>
+      <div className="min-h-screen bg-[var(--color-bg-primary)] flex">
+        <div className="hidden lg:flex w-1/2 relative overflow-hidden items-center justify-center p-12 grain">
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(160deg, var(--color-coral) 0%, #e5502f 100%)' }}
+          />
+          <div className="absolute inset-0 opacity-10 map-dots text-white" aria-hidden="true" />
+          <div className="relative text-white max-w-sm">
+            <p className="font-display text-3xl leading-snug">
+              Build a profile once. Get matched to every trip after.
+            </p>
+            <div className="text-white/60 mt-8">
+              <RouteMotif className="w-full h-14" color="#fff" />
+            </div>
+            <p className="text-sm text-white/70 mt-6">
+              Budget, travel style, and interests — tell us once, we'll do the matching.
+            </p>
+          </div>
+        </div>
 
-          <div className="bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-2xl p-8 shadow-sm">
-            <h1 className="text-xl font-semibold text-[var(--color-text-primary)] mb-1">Create your account</h1>
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-16">
+          <div className="w-full max-w-sm">
+            <Link to="/" className="flex justify-center mb-8 lg:hidden">
+              <Logo />
+            </Link>
+
+            <h1 className="font-display text-2xl font-semibold text-[var(--color-text-primary)] mb-1">Create your account</h1>
             <p className="text-sm text-[var(--color-text-secondary)] mb-6">Start finding your travel people</p>
 
             {success ? (
@@ -82,20 +102,20 @@ const Register = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] disabled:opacity-60 text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
+                  className="w-full bg-[var(--color-coral)] hover:brightness-95 disabled:opacity-60 text-white py-2.5 rounded-lg text-sm font-medium transition-all shadow-md shadow-[var(--color-coral)]/20"
                 >
                   {loading ? 'Creating account...' : 'Create account'}
                 </button>
               </form>
             )}
-          </div>
 
-          <p className="text-center text-sm text-[var(--color-text-secondary)] mt-6">
-            Already have an account?{' '}
-            <Link to="/login" className="text-[var(--color-accent)] hover:underline">
-              Log in
-            </Link>
-          </p>
+            <p className="text-center text-sm text-[var(--color-text-secondary)] mt-6">
+              Already have an account?{' '}
+              <Link to="/login" className="text-[var(--color-accent)] hover:underline">
+                Log in
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </PageTransition>
