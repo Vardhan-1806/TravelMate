@@ -12,12 +12,17 @@ const createReport = async (reporterId, { reportedUserId, reportedTripId, reason
     error.statusCode = 400;
     throw error;
   }
+  if (typeof reason !== 'string' || reason.trim().length < 5 || reason.length > 500) {
+    const error = new Error('Please provide a report reason between 5 and 500 characters');
+    error.statusCode = 400;
+    throw error;
+  }
 
   const report = await Report.create({
     reporter: reporterId,
     reportedUser: reportedUserId,
     reportedTrip: reportedTripId,
-    reason,
+    reason: reason.trim(),
   });
   return report;
 };

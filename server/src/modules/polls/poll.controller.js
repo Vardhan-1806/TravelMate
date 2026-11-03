@@ -1,4 +1,4 @@
-const { createPoll, castVote, getPollResults, closePoll } = require('./poll.service');
+const { createPoll, castVote, getPollResults, getPollsForTrip, closePoll } = require('./poll.service');
 
 const create = async (req, res) => {
   try {
@@ -20,8 +20,17 @@ const vote = async (req, res) => {
 
 const results = async (req, res) => {
   try {
-    const result = await getPollResults(req.params.pollId);
+    const result = await getPollResults(req.params.pollId, req.user.id);
     res.status(200).json(result);
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ message: err.message || 'Server error' });
+  }
+};
+
+const list = async (req, res) => {
+  try {
+    const polls = await getPollsForTrip(req.params.tripId, req.user.id);
+    res.status(200).json({ polls });
   } catch (err) {
     res.status(err.statusCode || 500).json({ message: err.message || 'Server error' });
   }
@@ -36,4 +45,4 @@ const close = async (req, res) => {
   }
 };
 
-module.exports = { create, vote, results, close };
+module.exports = { create, vote, results, list, close };

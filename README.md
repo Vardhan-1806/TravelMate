@@ -1,16 +1,84 @@
-# React + Vite
+# TravelMate
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Find your people. Plan together. Travel smarter.
 
-Currently, two official plugins are available:
+TravelMate is a compatibility-based social travel platform. It helps travelers discover people with similar budgets, interests, dates, transport preferences, and travel styles, then plan together inside a private trip workspace.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Live frontend
 
-## React Compiler
+Production preview: https://client-lyart-six-40.vercel.app
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The frontend is publicly deployed. Connect the production backend and set `VITE_API_URL` in Vercel before presenting authenticated flows.
 
-## Expanding the ESLint configuration
+## Current product loop
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```text
+Create profile → discover or host a trip → compare compatibility
+→ send or accept a join request → plan together → track budget and readiness
+```
+
+## Implemented capabilities
+
+- Responsive cinematic landing page with a lazy-loaded interactive route globe and accessible SVG fallback
+- Registration, login, refresh sessions, logout, and protected routes
+- Traveler profiles and matching preferences
+- Trip creation, discovery, filtering, sorting, and pagination
+- Explainable compatibility matching with Top-K heap ranking
+- Join requests, group membership, and seat protection
+- Private workspace with realtime Socket.IO chat
+- Collaborative itinerary and polls
+- Budget planning, expense splitting, and settlement suggestions
+- Activity-based preparation checklists and readiness scoring
+- Notifications, traveler reviews, reputation, reports, blocks, and moderation
+- Grounded AI trip planner and trip workspace assistant
+- Personalized recommendations
+- OpenStreetMap geocoding and nearby-place discovery
+
+## Technology
+
+- React, Vite, Tailwind CSS, Framer Motion, Three.js, React Three Fiber, Drei
+- React Router, TanStack Query, Axios, Socket.IO Client
+- Node.js, Express, MongoDB, Mongoose, Socket.IO
+- JWT access tokens with httpOnly refresh cookies
+- Gemini, Cloudinary, OpenStreetMap/Nominatim, Overpass
+
+## Local development
+
+### Server
+
+```bash
+cd server
+npm install
+copy .env.example .env
+npm run dev
+```
+
+### Client
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Set `VITE_API_URL=http://localhost:5000/api` in `client/.env` when needed. Never commit real credentials.
+
+## Verification
+
+```bash
+cd client && npm run lint && npm run build
+cd ../server && npm test -- --runInBand
+```
+
+## Documentation
+
+- [Architecture](ARCHITECTURE.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [Security audit](docs/SECURITY-AUDIT.md)
+- [Testing strategy](docs/TESTING.md)
+- [Interview guide](docs/INTERVIEW-GUIDE.md)
+- [Project status](docs/PROJECT-STATUS.md)
+
+## Scope note
+
+TravelMate is a production-oriented MVP. Live emergency response, identity verification, live location, booking integrations, and commercial partnerships are intentionally not represented as complete features.

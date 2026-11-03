@@ -2,14 +2,14 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CalendarIcon, WalletIcon, TransportIcon, UsersIcon } from './Icons';
 
-// Ocean, sunset & sand — pulled from the same palette as the rest of the app,
-// never arbitrary hues, so a grid of cards still reads as one brand.
+// Same restrained palette as the rest of the app, each just a shade of one
+// tone — enough to tell cards apart without a grid of trips looking loud.
 const GRADIENTS = [
-  'linear-gradient(135deg, #0e7c7b 0%, #17a398 100%)',
-  'linear-gradient(135deg, #ff6b4a 0%, #ff9166 100%)',
-  'linear-gradient(135deg, #f2b134 0%, #e89a1c 100%)',
-  'linear-gradient(135deg, #0a5f5e 0%, #1c8b89 100%)',
-  'linear-gradient(135deg, #c8503a 0%, #ff6b4a 100%)',
+  'linear-gradient(135deg, #3f6b66 0%, #5c8983 100%)',
+  'linear-gradient(135deg, #ae6a4f 0%, #c08a6f 100%)',
+  'linear-gradient(135deg, #b98a4e 0%, #cba36f 100%)',
+  'linear-gradient(135deg, #33474b 0%, #52696d 100%)',
+  'linear-gradient(135deg, #6b5d4a 0%, #8a7a63 100%)',
 ];
 
 const gradientFor = (str) => {
@@ -17,25 +17,28 @@ const gradientFor = (str) => {
   return GRADIENTS[index];
 };
 
-const TripCard = ({ trip }) => {
+const TripCard = ({ trip, featured = false }) => {
   const seatsLeft = trip.maxMembers - trip.currentMembers;
   const isAlmostFull = seatsLeft <= 2;
+  const visualIndex = trip.destination.split('').reduce((acc, character) => acc + character.charCodeAt(0), 0) % GRADIENTS.length;
 
   return (
-    <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.15 }}>
+    <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }} className={featured ? 'md:col-span-2' : ''}>
       <Link
         to={`/trips/${trip._id}`}
-        className="group block bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-black/5 hover:border-[var(--color-accent)]/40 transition-all duration-200"
+        className={`group block overflow-hidden rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-bg-elevated)] transition-all duration-300 hover:border-[var(--color-accent)]/50 hover:shadow-[0_24px_60px_-38px_rgba(18,60,53,.72)] ${featured ? 'md:grid md:grid-cols-[1.1fr_.9fr]' : ''}`}
       >
         <div
-          className="h-28 relative flex items-end p-4 overflow-hidden"
+          className={`${featured ? 'h-56 md:h-full' : 'h-36'} relative flex items-end overflow-hidden p-5`}
           style={{ background: gradientFor(trip.destination) }}
         >
           <div
-            className="absolute inset-0 opacity-25 map-dots text-white"
+            className="absolute inset-0 opacity-20 map-dots text-white"
             aria-hidden="true"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
+          <div className="absolute -right-8 -top-12 h-44 w-44 rounded-full border border-white/20" aria-hidden="true" />
+          <div className="absolute -bottom-20 left-1/3 h-52 w-52 rounded-full border border-white/15" aria-hidden="true" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
 
           {/* postmark-style seat badge, stamped in the corner */}
           <span
@@ -48,15 +51,21 @@ const TripCard = ({ trip }) => {
             {seatsLeft} {seatsLeft === 1 ? 'seat' : 'seats'} left
           </span>
 
-          <span className="relative font-display text-white text-base tracking-tight">
+          <div className="relative">
+            <span className="mb-2 block text-[10px] font-bold uppercase tracking-[.18em] text-white/65">Open journey · {String(visualIndex + 1).padStart(2, '0')}</span>
+            <span className="font-display text-xl tracking-tight text-white md:text-2xl">
             {trip.source} <span className="opacity-70">&rarr;</span> {trip.destination}
-          </span>
+            </span>
+          </div>
         </div>
 
-        <div className="p-5">
-          <h3 className="font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">
+        <div className={`${featured ? 'p-6 md:p-7' : 'p-5'}`}>
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="font-display text-2xl leading-tight text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)]">
             {trip.title}
-          </h3>
+            </h3>
+            {trip.compatibilityScore && <span className="shrink-0 rounded-full bg-[var(--color-accent-soft)] px-2.5 py-1 text-[10px] font-bold text-[var(--color-accent)]">{trip.compatibilityScore}% fit</span>}
+          </div>
 
           <div className="grid grid-cols-2 gap-y-2 gap-x-3 mt-4">
             <div className="flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)]">
@@ -98,6 +107,7 @@ const TripCard = ({ trip }) => {
               Hosted by {trip.creator?.name || 'Unknown'}
             </p>
           </div>
+          {featured && <div className="editorial-rule mt-5" />}
         </div>
       </Link>
     </motion.div>

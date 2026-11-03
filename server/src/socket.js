@@ -33,20 +33,29 @@ const initializeSocket = (io) => {
     });
 
     socket.on('send-message', async ({ tripId, content }) => {
-      const isMember = await TripMember.findOne({ trip: tripId, user: socket.userId });
-      if (!isMember) {
-        socket.emit('error', { message: 'You are not a member of this trip' });
-        return;
+      try {
+        if (typeof content !== 'string' || !content.trim() || content.trim().length > 2000) {
+          socket.emit('error', { message: 'Message must be between 1 and 2000 characters' });
+          return;
+        }
+
+        const isMember = await TripMember.findOne({ trip: tripId, user: socket.userId });
+        if (!isMember) {
+          socket.emit('error', { message: 'You are not a member of this trip' });
+          return;
+        }
+
+        const message = await Message.create({
+          trip: tripId,
+          sender: socket.userId,
+          content: content.trim(),
+        });
+        await message.populate('sender', 'name');
+
+        io.to(`trip:${tripId}`).emit('new-message', message);
+      } catch {
+        socket.emit('error', { message: 'Message could not be sent' });
       }
-
-      const message = await Message.create({
-        trip: tripId,
-        sender: socket.userId,
-        content,
-      });
-      await message.populate('sender', 'name');
-
-      io.to(`trip:${tripId}`).emit('new-message', message);
     });
 
     socket.on('disconnect', () => {

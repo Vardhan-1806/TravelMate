@@ -32,13 +32,24 @@ ${budgetText}`;
 };
 
 const askAssistant = async (tripId, userId, question) => {
+  if (!process.env.GEMINI_API_KEY) {
+    const error = new Error('AI assistant is not configured');
+    error.statusCode = 503;
+    throw error;
+  }
+  if (typeof question !== 'string' || question.trim().length < 2 || question.length > 1000) {
+    const error = new Error('Ask a question between 2 and 1000 characters');
+    error.statusCode = 400;
+    throw error;
+  }
+
   const context = await buildContext(tripId, userId);
 
   const prompt = `You are a travel assistant helping with a specific, already-planned trip. Use ONLY the real trip data below to answer — do not invent itinerary items, prices, or details not present in this data. If the data doesn't contain enough information to answer, say so honestly rather than guessing.
 
 ${context}
 
-User's question: ${question}
+    User's question: ${question.trim()}
 
 Give a helpful, concise answer (2-4 sentences) based strictly on the data above. If suggesting something not in the current plan (like a new activity), clearly mark it as a suggestion, not something already planned.`;
 

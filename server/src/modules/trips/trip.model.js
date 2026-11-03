@@ -11,7 +11,7 @@ const tripSchema = new mongoose.Schema(
     endDate: { type: Date, required: true },
 
     budgetPerPerson: { type: Number, required: true, min: 0 },
-    maxMembers: { type: Number, required: true, min: 1 },
+    maxMembers: { type: Number, required: true, min: 2, max: 20 },
     currentMembers: { type: Number, default: 1 },
 
     description: { type: String, maxlength: 1000, default: '' },
@@ -34,5 +34,6 @@ const tripSchema = new mongoose.Schema(
 
 tripSchema.index({ destination: 1, startDate: 1 });
 tripSchema.index({ status: 1, visibility: 1 });
+tripSchema.index({ status: 1, visibility: 1, destination: 1, startDate: 1 });
 
 module.exports = mongoose.model('Trip', tripSchema);

@@ -2,8 +2,19 @@ const ItineraryItem = require('./itineraryItem.model');
 const TripMember = require('../trips/tripMember.model');
 
 const createItem = async (tripId, userId, itemData) => {
+  if (typeof itemData.title !== 'string' || !itemData.title.trim() || !itemData.date) {
+    const error = new Error('Activity title and date are required');
+    error.statusCode = 400;
+    throw error;
+  }
+
   const item = await ItineraryItem.create({
-    ...itemData,
+    title: itemData.title.trim().slice(0, 120),
+    date: itemData.date,
+    time: typeof itemData.time === 'string' ? itemData.time.trim().slice(0, 30) : '',
+    location: typeof itemData.location === 'string' ? itemData.location.trim().slice(0, 120) : '',
+    description: typeof itemData.description === 'string' ? itemData.description.trim().slice(0, 500) : '',
+    estimatedCost: Math.max(0, Number(itemData.estimatedCost) || 0),
     trip: tripId,
     createdBy: userId,
   });

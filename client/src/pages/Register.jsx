@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import AuthShell from '../components/AuthShell';
 import Input from '../components/Input';
-import Logo from '../components/Logo';
 import PageTransition from '../components/PageTransition';
-import RouteMotif from '../components/RouteMotif';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -16,16 +15,20 @@ const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError('');
+    if (password.length < 8) {
+      setError('Use at least 8 characters for your password.');
+      return;
+    }
     setLoading(true);
     try {
-      await register(name, email, password);
+      await register(name.trim(), email.trim(), password);
       setSuccess(true);
-      setTimeout(() => navigate('/login'), 1200);
+      window.setTimeout(() => navigate('/login', { replace: true }), 1200);
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+      setError(err.response?.data?.message || 'We could not create your account. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -33,91 +36,24 @@ const Register = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-[var(--color-bg-primary)] flex">
-        <div className="hidden lg:flex w-1/2 relative overflow-hidden items-center justify-center p-12 grain">
-          <div
-            className="absolute inset-0"
-            style={{ background: 'linear-gradient(160deg, var(--color-coral) 0%, #e5502f 100%)' }}
-          />
-          <div className="absolute inset-0 opacity-10 map-dots text-white" aria-hidden="true" />
-          <div className="relative text-white max-w-sm">
-            <p className="font-display text-3xl leading-snug">
-              Build a profile once. Get matched to every trip after.
-            </p>
-            <div className="text-white/60 mt-8">
-              <RouteMotif className="w-full h-14" color="#fff" />
-            </div>
-            <p className="text-sm text-white/70 mt-6">
-              Budget, travel style, and interests — tell us once, we'll do the matching.
-            </p>
-          </div>
-        </div>
-
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-16">
-          <div className="w-full max-w-sm">
-            <Link to="/" className="flex justify-center mb-8 lg:hidden">
-              <Logo />
-            </Link>
-
-            <h1 className="font-display text-2xl font-semibold text-[var(--color-text-primary)] mb-1">Create your account</h1>
-            <p className="text-sm text-[var(--color-text-secondary)] mb-6">Start finding your travel people</p>
-
-            {success ? (
-              <p className="text-sm text-[var(--color-success)] bg-[var(--color-success)]/10 rounded-lg px-3 py-2">
-                Account created! Redirecting to login...
-              </p>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <Input
-                  label="Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                  required
-                />
-                <Input
-                  label="Email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  required
-                />
-                <Input
-                  label="Password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 8 characters"
-                  required
-                  minLength={8}
-                />
-
-                {error && (
-                  <p className="text-sm text-[var(--color-danger)] bg-[var(--color-danger)]/10 rounded-lg px-3 py-2">
-                    {error}
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-[var(--color-coral)] hover:brightness-95 disabled:opacity-60 text-white py-2.5 rounded-lg text-sm font-medium transition-all shadow-md shadow-[var(--color-coral)]/20"
-                >
-                  {loading ? 'Creating account...' : 'Create account'}
-                </button>
-              </form>
-            )}
-
-            <p className="text-center text-sm text-[var(--color-text-secondary)] mt-6">
-              Already have an account?{' '}
-              <Link to="/login" className="text-[var(--color-accent)] hover:underline">
-                Log in
-              </Link>
-            </p>
-          </div>
-        </div>
-      </div>
+      <AuthShell tone="coral" quote="Build a profile once. Get matched to every trip after." note="Budget, travel style, and interests — tell us once, and we will use them to make every recommendation more meaningful.">
+        <p className="eyebrow text-[var(--color-coral)]">Your travel profile</p>
+        <h1 className="mt-5 font-display text-5xl leading-none text-[var(--color-accent)]">Start with the people.</h1>
+        <p className="mt-4 text-sm leading-6 text-[var(--color-text-secondary)]">Create your account, then shape the kind of trips you want to find.</p>
+        {success ? (
+          <div role="status" className="mt-9 rounded-2xl border border-[var(--color-success)]/20 bg-[var(--color-success)]/10 p-5 text-sm leading-6 text-[var(--color-success)]">Account created. Taking you to sign in…</div>
+        ) : (
+          <form onSubmit={handleSubmit} className="mt-9 space-y-5" noValidate>
+            <Input label="Your name" value={name} onChange={(e) => setName(e.target.value)} placeholder="What should your travel people call you?" autoComplete="name" required />
+            <Input label="Email address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required />
+            <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" autoComplete="new-password" minLength={8} hint="Use a unique password you do not use elsewhere." required />
+            {error && <p role="alert" className="rounded-xl border border-[var(--color-danger)]/20 bg-[var(--color-danger)]/10 px-4 py-3 text-sm text-[var(--color-danger)]">{error}</p>}
+            <button type="submit" disabled={loading} className="button-lift w-full rounded-xl bg-[var(--color-coral)] py-3.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-60">{loading ? 'Creating your profile…' : 'Create account'}</button>
+            <p className="text-center text-xs leading-5 text-[var(--color-text-muted)]">By continuing, you agree to be respectful and honest with the people you travel with.</p>
+          </form>
+        )}
+        <p className="mt-7 text-center text-sm text-[var(--color-text-secondary)]">Already have an account? <Link to="/login" className="font-bold text-[var(--color-accent)] hover:underline">Sign in</Link></p>
+      </AuthShell>
     </PageTransition>
   );
 };

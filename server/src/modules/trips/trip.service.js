@@ -1,9 +1,28 @@
 const Trip = require('./trip.model');
 const TripMember = require('./tripMember.model');
 
+const ALLOWED_SORTS = new Set(['createdAt', 'startDate', 'endDate', 'budgetPerPerson', 'destination']);
+
+const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const parsePositiveInteger = (value, fallback, max) => {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
+  return Math.min(parsed, max);
+};
+
 const createTrip = async (creatorId, tripData) => {
+  const allowedFields = [
+    'title', 'source', 'destination', 'startDate', 'endDate', 'budgetPerPerson',
+    'maxMembers', 'description', 'tripType', 'transport', 'accommodation',
+    'meetingPoint', 'requirements', 'visibility',
+  ];
+  const safeTripData = Object.fromEntries(
+    allowedFields.filter((field) => tripData[field] !== undefined).map((field) => [field, tripData[field]])
+  );
+
   const trip = await Trip.create({
-    ...tripData,
+    ...safeTripData,
     creator: creatorId,
     currentMembers: 1,
   });
@@ -18,6 +37,12 @@ const createTrip = async (creatorId, tripData) => {
 };
 
 const getTripById = async (tripId) => {
+  if (!tripId || !require('mongoose').isValidObjectId(tripId)) {
+    const error = new Error('Trip not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
   const trip = await Trip.findById(tripId).populate('creator', 'name email profile.city');
   if (!trip) {
     const error = new Error('Trip not found');
@@ -47,10 +72,10 @@ const discoverTrips = async (filters) => {
   const query = { status: 'OPEN', visibility: 'PUBLIC' };
 
   if (destination) {
-    query.destination = { $regex: destination, $options: 'i' };
+    query.destination = { $regex: escapeRegex(destination.trim()).slice(0, 80), $options: 'i' };
   }
   if (source) {
-    query.source = { $regex: source, $options: 'i' };
+    query.source = { $regex: escapeRegex(source.trim()).slice(0, 80), $options: 'i' };
   }
   if (transport) {
     query.transport = transport;
@@ -58,29 +83,33 @@ const discoverTrips = async (filters) => {
   if (accommodation) {
     query.accommodation = accommodation;
   }
-  if (minBudget || maxBudget) {
+  const parsedMinBudget = Number(minBudget);
+  const parsedMaxBudget = Number(maxBudget);
+  if (Number.isFinite(parsedMinBudget) || Number.isFinite(parsedMaxBudget)) {
     query.budgetPerPerson = {};
-    if (minBudget) query.budgetPerPerson.$gte = Number(minBudget);
-    if (maxBudget) query.budgetPerPerson.$lte = Number(maxBudget);
+    if (Number.isFinite(parsedMinBudget) && parsedMinBudget >= 0) query.budgetPerPerson.$gte = parsedMinBudget;
+    if (Number.isFinite(parsedMaxBudget) && parsedMaxBudget >= 0) query.budgetPerPerson.$lte = parsedMaxBudget;
   }
   if (startDate || endDate) {
-    query.startDate = {};
-    if (startDate) query.startDate.$gte = new Date(startDate);
-    if (endDate) query.startDate.$lte = new Date(endDate);
+    if (startDate && !Number.isNaN(new Date(startDate).getTime())) query.endDate = { $gte: new Date(startDate) };
+    if (endDate && !Number.isNaN(new Date(endDate).getTime())) query.startDate = { $lte: new Date(endDate) };
   }
   if (hasAvailableSeats === 'true') {
     query.$expr = { $lt: ['$currentMembers', '$maxMembers'] };
   }
 
-  const skip = (Number(page) - 1) * Number(limit);
+  const safePage = parsePositiveInteger(page, 1, 100000);
+  const safeLimit = parsePositiveInteger(limit, 12, 50);
+  const skip = (safePage - 1) * safeLimit;
   const sortOrder = order === 'asc' ? 1 : -1;
+  const safeSortBy = ALLOWED_SORTS.has(sortBy) ? sortBy : 'createdAt';
 
   const [trips, total] = await Promise.all([
     Trip.find(query)
       .populate('creator', 'name profile.city')
-      .sort({ [sortBy]: sortOrder })
+      .sort({ [safeSortBy]: sortOrder })
       .skip(skip)
-      .limit(Number(limit)),
+      .limit(safeLimit),
     Trip.countDocuments(query),
   ]);
 
@@ -88,9 +117,9 @@ const discoverTrips = async (filters) => {
     trips,
     pagination: {
       total,
-      page: Number(page),
-      limit: Number(limit),
-      totalPages: Math.ceil(total / Number(limit)),
+       page: safePage,
+       limit: safeLimit,
+       totalPages: Math.ceil(total / safeLimit),
     },
   };
 };

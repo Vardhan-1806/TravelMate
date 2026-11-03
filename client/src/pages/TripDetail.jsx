@@ -156,6 +156,11 @@ const TripDetail = () => {
             </div>
           </div>
 
+          <div className="mt-5 flex flex-wrap gap-3 text-xs">
+            {user && trip.status === 'COMPLETED' && <Link to={`/trips/${tripId}/review`} className="font-bold text-[var(--color-coral)]">Review a traveler ↗</Link>}
+            {user && trip.creator?._id !== user.id && <Link to={`/safety?user=${trip.creator?._id}`} className="font-semibold text-[var(--color-text-muted)]">Report or block host</Link>}
+          </div>
+
           <div className="mt-8">
             {!user && (
               <Link
@@ -167,9 +172,17 @@ const TripDetail = () => {
             )}
 
             {user && isOwnTrip && (
-              <p className="text-sm text-[var(--color-text-muted)] text-center py-3">
-                This is your trip.
-              </p>
+              <div className="space-y-2">
+                <Link
+                  to={`/trips/${tripId}/workspace`}
+                  className="block text-center w-full bg-[var(--color-accent)] hover:brightness-95 text-white py-3 rounded-xl text-sm font-medium transition-all shadow-md shadow-[var(--color-accent)]/20"
+                >
+                  Open Trip Workspace &rarr;
+                </Link>
+                <p className="text-xs text-[var(--color-text-muted)] text-center">
+                  You are the organizer of this trip.
+                </p>
+              </div>
             )}
 
             {user && !isOwnTrip && seatsLeft <= 0 && (

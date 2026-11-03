@@ -1,5 +1,6 @@
 const RecommendationInteraction = require('./interaction.model');
 const Trip = require('../trips/trip.model');
+const TripMember = require('../trips/tripMember.model');
 
 const getInferredInterests = async (userId) => {
   const interactions = await RecommendationInteraction.find({ user: userId })
@@ -25,15 +26,40 @@ const getInferredInterests = async (userId) => {
 
 const getPersonalizedRecommendations = async (userId, limit = 10) => {
   const inferredInterests = await getInferredInterests(userId);
+  const safeLimit = Math.max(1, Math.min(Number(limit) || 10, 24));
+  const memberships = await TripMember.find({ user: userId }).select('trip').lean();
 
-  const query = { status: 'OPEN', visibility: 'PUBLIC' };
+  const query = {
+    status: 'OPEN',
+    visibility: 'PUBLIC',
+    creator: { $ne: userId },
+    _id: { $nin: memberships.map((membership) => membership.trip) },
+    $expr: { $lt: ['$currentMembers', '$maxMembers'] },
+  };
   if (inferredInterests.length > 0) {
     query.tripType = { $in: inferredInterests };
   }
 
-  const trips = await Trip.find(query).limit(Number(limit)).populate('creator', 'name');
+  const trips = await Trip.find(query).sort({ createdAt: -1 }).limit(safeLimit).populate('creator', 'name profile.city');
 
-  return { trips, inferredInterests };
+  return {
+    trips: trips.map((trip) => ({
+      ...trip.toObject(),
+      recommendationReason: inferredInterests.length > 0
+        ? `Matches your interest in ${inferredInterests.slice(0, 2).join(' and ')}`
+        : 'A fresh open trip from the TravelMate community',
+    })),
+    inferredInterests,
+  };
 };
 
-module.exports = { getPersonalizedRecommendations };
+const recordInteraction = async (userId, tripId, type) => {
+  if (!['VIEW', 'SAVE', 'JOIN_REQUESTED'].includes(type)) {
+    const error = new Error('Invalid recommendation interaction');
+    error.statusCode = 400;
+    throw error;
+  }
+  return RecommendationInteraction.create({ user: userId, trip: tripId, type });
+};
+
+module.exports = { getPersonalizedRecommendations, recordInteraction };

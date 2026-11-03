@@ -42,6 +42,7 @@ const createJoinRequest = async (tripId, userId, message) => {
       type: 'JOIN_REQUEST_RECEIVED',
       message: `Someone requested to join your trip "${trip.title}"`,
       relatedTrip: trip._id,
+      relatedJoinRequest: joinRequest._id,
     });
 
     return joinRequest;
@@ -115,4 +116,17 @@ const respondToJoinRequest = async (requestId, tripAdminId, decision) => {
   return joinRequest;
 };
 
-module.exports = { createJoinRequest, respondToJoinRequest };
+const getRequestsForTrip = async (tripId, tripAdminId) => {
+  const trip = await Trip.findOne({ _id: tripId, creator: tripAdminId });
+  if (!trip) {
+    const error = new Error('Only the trip creator can view join requests');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  return JoinRequest.find({ trip: tripId })
+    .populate('user', 'name email profile.city travelPreferences.travelStyle travelPreferences.interests')
+    .sort({ createdAt: -1 });
+};
+
+module.exports = { createJoinRequest, respondToJoinRequest, getRequestsForTrip };

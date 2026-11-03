@@ -10,3 +10,8 @@ export const fetchTrips = async (filters) => {
   const res = await api.get(`/trips?${params.toString()}`);
   return res.data;
 };
+
+export const createTrip = async (tripData) => {
+  const res = await api.post('/trips', tripData);
+  return res.data;
+};

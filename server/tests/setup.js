@@ -1,10 +1,17 @@
+require('dotenv').config();
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
+
+if (typeof jest !== 'undefined') {
+  jest.setTimeout(60000);
+}
 
 let mongoServer;
 
 const connectTestDB = async () => {
-  mongoServer = await MongoMemoryServer.create();
+  mongoServer = await MongoMemoryServer.create({
+    instance: { launchTimeout: 60000 },
+  });
   const uri = mongoServer.getUri();
   await mongoose.connect(uri);
 };

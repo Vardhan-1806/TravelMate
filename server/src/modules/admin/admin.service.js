@@ -23,6 +23,11 @@ const getAllReports = async (statusFilter) => {
 };
 
 const resolveReport = async (reportId, newStatus) => {
+  if (!['REVIEWED', 'DISMISSED', 'PENDING'].includes(newStatus)) {
+    const error = new Error('Invalid report status');
+    error.statusCode = 400;
+    throw error;
+  }
   const report = await Report.findByIdAndUpdate(
     reportId,
     { $set: { status: newStatus } },

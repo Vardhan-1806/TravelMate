@@ -10,6 +10,7 @@ const notificationSchema = new mongoose.Schema(
     },
     message: { type: String, required: true },
     relatedTrip: { type: mongoose.Schema.Types.ObjectId, ref: 'Trip' },
+    relatedJoinRequest: { type: mongoose.Schema.Types.ObjectId, ref: 'JoinRequest' },
     isRead: { type: Boolean, default: false },
   },
   { timestamps: true }

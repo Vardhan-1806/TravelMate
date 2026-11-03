@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/', authenticate, validateCreateTrip, handleValidationErrors, create);
 router.get('/', discover);
-router.get('/:id', authenticate, getOne);
+router.get('/:id', getOne);
 router.patch('/:id/complete', authenticate, complete);
 
 module.exports = router;

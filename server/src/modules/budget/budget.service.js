@@ -1,9 +1,24 @@
 const Budget = require('./budget.model');
 
+const CATEGORY_NAMES = ['transport', 'accommodation', 'food', 'activities', 'emergency', 'miscellaneous'];
+
 const upsertBudget = async (tripId, userId, categories) => {
+  const sanitizedCategories = {};
+  for (const category of CATEGORY_NAMES) {
+    const values = categories?.[category] || {};
+    const estimated = Number(values.estimated) || 0;
+    const actual = Number(values.actual) || 0;
+    if (estimated < 0 || actual < 0 || estimated > 100000000 || actual > 100000000) {
+      const error = new Error('Budget values must be positive and realistic');
+      error.statusCode = 400;
+      throw error;
+    }
+    sanitizedCategories[category] = { estimated, actual };
+  }
+
   const budget = await Budget.findOneAndUpdate(
     { trip: tripId, user: userId },
-    { $set: { categories } },
+    { $set: { categories: sanitizedCategories } },
     { new: true, upsert: true, runValidators: true }
   );
   return budget;

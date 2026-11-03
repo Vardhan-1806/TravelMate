@@ -13,5 +13,6 @@ const preparationItemSchema = new mongoose.Schema(
 );
 
 preparationItemSchema.index({ trip: 1, user: 1 });
+preparationItemSchema.index({ trip: 1, user: 1, item: 1 }, { unique: true });
 
 module.exports = mongoose.model('PreparationItem', preparationItemSchema);

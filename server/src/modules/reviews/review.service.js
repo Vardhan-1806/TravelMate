@@ -3,6 +3,18 @@ const Trip = require('../trips/trip.model');
 const TripMember = require('../trips/tripMember.model');
 
 const createReview = async (tripId, reviewerId, { revieweeId, ratings, comment }) => {
+  if (!revieweeId || !ratings || typeof comment !== 'string' || comment.length > 500) {
+    const error = new Error('Review target, ratings, and a valid comment are required');
+    error.statusCode = 400;
+    throw error;
+  }
+  for (const dimension of ['reliability', 'communication', 'cooperation', 'respect']) {
+    if (!Number.isInteger(Number(ratings[dimension])) || Number(ratings[dimension]) < 1 || Number(ratings[dimension]) > 5) {
+      const error = new Error('Each rating must be an integer from 1 to 5');
+      error.statusCode = 400;
+      throw error;
+    }
+  }
   if (reviewerId === revieweeId) {
     const error = new Error('You cannot review yourself');
     error.statusCode = 400;
@@ -42,8 +54,13 @@ const createReview = async (tripId, reviewerId, { revieweeId, ratings, comment }
       trip: tripId,
       reviewer: reviewerId,
       reviewee: revieweeId,
-      ratings,
-      comment,
+      ratings: {
+        reliability: Number(ratings.reliability),
+        communication: Number(ratings.communication),
+        cooperation: Number(ratings.cooperation),
+        respect: Number(ratings.respect),
+      },
+      comment: comment.trim(),
     });
     return review;
   } catch (err) {

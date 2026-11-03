@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import api from '../api/axios';
+import { clearAccessToken, setAccessToken } from '../lib/authToken';
 
 const AuthContext = createContext();
 
@@ -8,18 +10,32 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    const storedUser = localStorage.getItem('user');
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    let active = true;
+
+    const restoreSession = async () => {
+      try {
+        const res = await api.post('/auth/refresh');
+        if (active) {
+          setAccessToken(res.data.accessToken);
+          setUser(res.data.user);
+        }
+      } catch {
+        clearAccessToken();
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    restoreSession();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
-    localStorage.setItem('accessToken', res.data.accessToken);
-    localStorage.setItem('user', JSON.stringify(res.data.user));
+    setAccessToken(res.data.accessToken);
     setUser(res.data.user);
     return res.data.user;
   };
@@ -29,14 +45,24 @@ export const AuthProvider = ({ children }) => {
     return res.data.user;
   };
 
-  const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('user');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } finally {
+      clearAccessToken();
+      setUser(null);
+    }
   };
 
+  const updateUser = (updates) => setUser((current) => ({ ...current, ...updates }));
+
+  const value = useMemo(
+    () => ({ user, loading, isAuthenticated: Boolean(user), login, register, logout, updateUser }),
+    [user, loading]
+  );
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

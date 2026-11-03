@@ -1,4 +1,4 @@
-const { createJoinRequest, respondToJoinRequest } = require('./joinRequest.service');
+const { createJoinRequest, respondToJoinRequest, getRequestsForTrip } = require('./joinRequest.service');
 
 const create = async (req, res) => {
   try {
@@ -22,4 +22,13 @@ const respond = async (req, res) => {
   }
 };
 
-module.exports = { create, respond };
+const list = async (req, res) => {
+  try {
+    const joinRequests = await getRequestsForTrip(req.params.tripId, req.user.id);
+    res.status(200).json({ joinRequests });
+  } catch (err) {
+    res.status(err.statusCode || 500).json({ message: err.message || 'Server error' });
+  }
+};
+
+module.exports = { create, respond, list };

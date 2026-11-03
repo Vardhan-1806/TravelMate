@@ -1,9 +1,9 @@
 const { body, validationResult } = require('express-validator');
 
 const validateCreateTrip = [
-  body('title').trim().notEmpty().withMessage('Title is required'),
-  body('source').trim().notEmpty().withMessage('Source is required'),
-  body('destination').trim().notEmpty().withMessage('Destination is required'),
+  body('title').trim().isLength({ min: 4, max: 120 }).withMessage('Title must be between 4 and 120 characters'),
+  body('source').trim().isLength({ min: 2, max: 80 }).withMessage('Source is required'),
+  body('destination').trim().isLength({ min: 2, max: 80 }).withMessage('Destination is required'),
   body('startDate').isISO8601().withMessage('Valid start date is required'),
   body('endDate').isISO8601().withMessage('Valid end date is required')
     .custom((endDate, { req }) => {
@@ -12,8 +12,11 @@ const validateCreateTrip = [
       }
       return true;
     }),
-  body('budgetPerPerson').isFloat({ min: 0 }).withMessage('Budget must be a positive number'),
-  body('maxMembers').isInt({ min: 1 }).withMessage('Max members must be at least 1'),
+  body('budgetPerPerson').isFloat({ min: 1, max: 10000000 }).withMessage('Budget must be between ₹1 and ₹10,000,000'),
+  body('maxMembers').isInt({ min: 2, max: 20 }).withMessage('Group size must be between 2 and 20'),
+  body('description').optional().trim().isLength({ max: 1000 }).withMessage('Description cannot exceed 1000 characters'),
+  body('meetingPoint').optional().trim().isLength({ max: 160 }).withMessage('Meeting point cannot exceed 160 characters'),
+  body('requirements').optional().trim().isLength({ max: 500 }).withMessage('Requirements cannot exceed 500 characters'),
 ];
 
 const handleValidationErrors = (req, res, next) => {

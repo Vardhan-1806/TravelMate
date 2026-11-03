@@ -53,7 +53,12 @@ const togglePacked = async (itemId, userId) => {
 };
 
 const addCustomItem = async (tripId, userId, { category, item }) => {
-  return PreparationItem.create({ trip: tripId, user: userId, category, item, isCustom: true });
+  if (typeof category !== 'string' || typeof item !== 'string' || !category.trim() || !item.trim() || item.trim().length > 120) {
+    const error = new Error('A checklist item and category are required');
+    error.statusCode = 400;
+    throw error;
+  }
+  return PreparationItem.create({ trip: tripId, user: userId, category: category.trim().slice(0, 40), item: item.trim(), isCustom: true });
 };
 
 const removeItem = async (itemId, userId) => {

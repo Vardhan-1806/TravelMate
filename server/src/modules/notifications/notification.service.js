@@ -1,7 +1,7 @@
 const Notification = require('./notification.model');
 
-const createNotification = async ({ userId, type, message, relatedTrip }) => {
-  return Notification.create({ user: userId, type, message, relatedTrip });
+const createNotification = async ({ userId, type, message, relatedTrip, relatedJoinRequest }) => {
+  return Notification.create({ user: userId, type, message, relatedTrip, relatedJoinRequest });
 };
 
 const getMyNotifications = async (userId, unreadOnly = false) => {

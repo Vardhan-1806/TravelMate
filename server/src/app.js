@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
+const mongoose = require('mongoose');
 const authRoutes = require('./modules/auth/auth.routes');
 const profileRoutes = require('./modules/profiles/profile.routes');
 const tripRoutes = require('./modules/trips/trip.routes');
@@ -31,15 +33,55 @@ const messageRoutes = require('./modules/chat/message.routes');
 
 const app = express();
 
+app.set('trust proxy', 1);
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
-app.use(express.json());
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Origin is not allowed by CORS'));
+  },
+  credentials: true,
+}));
+app.use((req, res, next) => {
+  const requestId = req.get('x-request-id') || crypto.randomUUID();
+  req.requestId = requestId;
+  res.setHeader('x-request-id', requestId);
+  next();
+});
+app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
+  const databaseReady = mongoose.connection.readyState === 1;
+  res.status(200).json({
+    status: databaseReady ? 'ok' : 'degraded',
+    database: databaseReady ? 'connected' : 'disconnected',
+    requestId: req.requestId,
+  });
+});
+
+app.get('/api/ready', (req, res) => {
+  const databaseReady = mongoose.connection.readyState === 1;
+  res.status(databaseReady ? 200 : 503).json({
+    status: databaseReady ? 'ready' : 'not_ready',
+    database: databaseReady ? 'connected' : 'disconnected',
+    requestId: req.requestId,
+  });
 });
 const rateLimit = require('express-rate-limit');
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  message: { message: 'Too many requests, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.path === '/health',
+});
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -49,7 +91,16 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  message: { message: 'Too many AI requests, please try again later' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api', apiLimiter);
 app.use('/api/profile', profileRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/matching', matchingRoutes);
@@ -65,8 +116,8 @@ app.use('/api/safety', safetyRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/preparation', preparationRoutes);
 app.use('/api/readiness', readinessRoutes);
-app.use('/api/ai', aiPlannerRoutes);
-app.use('/api/ai/assistant', aiAssistantRoutes);
+app.use('/api/ai', aiLimiter, aiPlannerRoutes);
+app.use('/api/ai/assistant', aiLimiter, aiAssistantRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/maps', mapsRoutes);
 app.use('/api/safety-checkin', safetyCheckinRoutes);
@@ -74,6 +125,18 @@ app.use('/api/memories', memoryRoutes);
 app.use('/api/communities', communityRoutes);
 app.use('/api/messages', messageRoutes);
 
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found', requestId: req.requestId });
+});
 
+app.use((err, req, res, next) => {
+  if (res.headersSent) return next(err);
+  const status = err.statusCode || (err.message?.includes('CORS') ? 403 : 500);
+  if (status >= 500) console.error(`[${req.requestId}]`, err);
+  res.status(status).json({
+    message: status >= 500 && process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message || 'Server error',
+    requestId: req.requestId,
+  });
+});
 
 module.exports = app;

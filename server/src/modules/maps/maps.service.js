@@ -21,6 +21,12 @@ const geocodeDestination = async (placeName) => {
 };
 
 const findNearbyPlaces = async (latitude, longitude, category = 'restaurant', radiusMeters = 2000) => {
+  if (!Number.isFinite(Number(latitude)) || !Number.isFinite(Number(longitude)) || Number(latitude) < -90 || Number(latitude) > 90 || Number(longitude) < -180 || Number(longitude) > 180) {
+    const error = new Error('Valid latitude and longitude are required');
+    error.statusCode = 400;
+    throw error;
+  }
+  const safeRadius = Math.max(100, Math.min(Number(radiusMeters) || 2000, 10000));
   const categoryMap = {
     restaurant: 'amenity=restaurant',
     hospital: 'amenity=hospital',
@@ -38,14 +44,14 @@ const findNearbyPlaces = async (latitude, longitude, category = 'restaurant', ra
 
   const query = `
     [out:json][timeout:15];
-    node[${tag}](around:${radiusMeters},${latitude},${longitude});
+     node[${tag}](around:${safeRadius},${latitude},${longitude});
     out body 20;
   `;
 
  const response = await axios.post(
-  'https://overpass-api.de/api/interpreter',
-  `data=${encodeURIComponent(query)}`,
-  { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+   'https://overpass-api.de/api/interpreter',
+   `data=${encodeURIComponent(query)}`,
+   { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, timeout: 20000 }
 );
 
   return response.data.elements.map((place) => ({
