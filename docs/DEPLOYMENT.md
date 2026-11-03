@@ -16,9 +16,11 @@ MongoDB Atlas
 ## Current deployment
 
 - Frontend: https://client-lyart-six-40.vercel.app
-- Backend: not deployed yet
+- Backend: https://travelmate-bfqv.onrender.com
+- Health: https://travelmate-bfqv.onrender.com/api/health
+- Readiness: https://travelmate-bfqv.onrender.com/api/ready
 
-The frontend currently needs a production `VITE_API_URL` pointing to the Render API before login, trips, chat, AI, maps, and other authenticated features work on the public URL.
+Vercel production is configured with `VITE_API_URL=https://travelmate-bfqv.onrender.com/api`. Set Render `CLIENT_URL=https://client-lyart-six-40.vercel.app` before testing authenticated browser flows.
 
 ## Required server variables
 

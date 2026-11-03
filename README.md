@@ -6,9 +6,10 @@ TravelMate is a compatibility-based social travel platform. It helps travelers d
 
 ## Live frontend
 
-Production preview: https://client-lyart-six-40.vercel.app
+Production frontend: https://client-lyart-six-40.vercel.app
+Production API: https://travelmate-bfqv.onrender.com
 
-The frontend is publicly deployed. Connect the production backend and set `VITE_API_URL` in Vercel before presenting authenticated flows.
+The frontend and API are deployed. Authenticated flows require the Render `CLIENT_URL` value to exactly match the frontend origin.
 
 ## Current product loop
 
