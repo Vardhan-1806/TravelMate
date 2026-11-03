@@ -42,7 +42,7 @@ Use unique secrets for production. Store them only in the hosting provider's sec
 1. Create a separate MongoDB Atlas production database.
 2. Restrict Atlas network access to the backend deployment where practical.
 3. Configure frontend and API under the same parent domain to keep secure cookies same-site.
-4. Set the exact frontend origin in `CLIENT_URL`.
+4. Set the exact frontend origin in `CLIENT_URL`. The production refresh cookie uses `SameSite=None; Secure` because the current Vercel and Render hosts are different sites.
 5. Configure Cloudinary upload limits and allowed formats.
 6. Set Gemini quotas and monitor AI request costs.
 7. Run client lint/build and server tests in CI.

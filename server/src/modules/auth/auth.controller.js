@@ -3,7 +3,9 @@ const { registerUser, loginUser, refreshUserSession } = require('./auth.service'
 const refreshCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict',
+  // Vercel and Render are different sites in the current deployment topology.
+  // Production cross-site refresh cookies must opt into SameSite=None and Secure.
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
