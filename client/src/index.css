@@ -199,6 +199,173 @@ select {
   box-shadow: 0 42px 100px -44px rgba(18, 60, 53, 0.92);
 }
 
+.destination-art {
+  position: relative;
+  height: 100%;
+  min-height: 9rem;
+  overflow: hidden;
+  background: var(--art-horizon);
+}
+
+.destination-art svg {
+  transition: transform 700ms cubic-bezier(.2,.75,.2,1);
+}
+
+.group:hover .destination-art svg {
+  transform: scale(1.045);
+}
+
+.destination-art__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 33, 30, .03) 30%, rgba(10, 33, 30, .55) 100%);
+}
+
+.destination-art__label {
+  position: absolute;
+  top: 1rem;
+  left: 1.25rem;
+  z-index: 2;
+  display: grid;
+  gap: .15rem;
+  color: #fffdf8;
+  text-shadow: 0 2px 16px rgba(10, 33, 30, .32);
+}
+
+.destination-art__label span,
+.transport-scene span {
+  font-size: .58rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  opacity: .72;
+}
+
+.transport-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: .45rem .7rem;
+  color: var(--color-text-secondary);
+  font-size: .7rem;
+  font-weight: 800;
+  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.transport-chip:hover,
+.transport-chip.active {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.transport-chip__icon {
+  color: var(--color-coral);
+  font-size: .8rem;
+}
+
+.destination-art__label strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+.transport-scene {
+  position: absolute;
+  right: .85rem;
+  bottom: .65rem;
+  z-index: 2;
+  width: 9rem;
+  height: 3.5rem;
+  color: #fffdf8;
+  opacity: .9;
+}
+
+.transport-scene span {
+  position: absolute;
+  right: .25rem;
+  bottom: 0;
+}
+
+.transport-vehicle {
+  animation: vehicle-travel 4.8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.transport-scene--flight .transport-vehicle,
+.transport-scene--flight svg > path + path {
+  animation: plane-glide 4.2s ease-in-out infinite;
+}
+
+@keyframes vehicle-travel {
+  0%, 100% { transform: translateX(-12px); }
+  50% { transform: translateX(24px); }
+}
+
+@keyframes plane-glide {
+  0%, 100% { transform: translate(-16px, 8px) rotate(-7deg); }
+  50% { transform: translate(16px, -8px) rotate(-2deg); }
+}
+
+.journey-strip {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+  background: var(--color-bg-elevated);
+}
+
+.journey-strip::before {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-border) 32%, transparent) 1px, transparent 1px);
+  background-size: 72px 100%;
+  content: "";
+  opacity: .45;
+}
+
+.dashboard-hero {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--color-coral-soft) 78%, transparent), transparent 28%), var(--color-bg-elevated);
+}
+
+.dashboard-hero::after {
+  position: absolute;
+  right: -6rem;
+  bottom: -10rem;
+  width: 25rem;
+  height: 25rem;
+  border: 1px solid color-mix(in srgb, var(--color-coral) 24%, transparent);
+  border-radius: 50%;
+  content: "";
+}
+
+.dashboard-stat {
+  display: grid;
+  gap: .2rem;
+  border-left: 1px solid var(--color-border);
+  padding-left: .75rem;
+}
+
+.dashboard-stat strong {
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 400;
+}
+
+.dashboard-stat span {
+  color: var(--color-text-muted);
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
 .workspace-hero {
   position: relative;
   overflow: hidden;

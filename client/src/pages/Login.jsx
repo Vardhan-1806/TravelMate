@@ -36,7 +36,8 @@ const Login = () => {
         <p className="mt-4 text-sm leading-6 text-[var(--color-text-secondary)]">Sign in to keep planning with your people.</p>
         <form onSubmit={handleSubmit} className="mt-9 space-y-5" noValidate>
           <Input label="Email address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required />
-          <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" autoComplete="current-password" required />
+           <Input label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" autoComplete="current-password" required />
+           <div className="-mt-2 text-right"><Link to="/forgot-password" className="text-xs font-bold text-[var(--color-accent)] hover:underline">Forgot password?</Link></div>
           {error && <p role="alert" className="rounded-xl border border-[var(--color-danger)]/20 bg-[var(--color-danger)]/10 px-4 py-3 text-sm text-[var(--color-danger)]">{error}</p>}
           <button type="submit" disabled={loading} className="button-lift w-full rounded-xl bg-[var(--color-coral)] py-3.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-60">{loading ? 'Signing you in…' : 'Sign in'}</button>
         </form>

@@ -89,6 +89,7 @@ const authLimiter = rateLimit({
   message: { message: 'Too many attempts, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.DISABLE_RATE_LIMITS === 'true' || process.env.NODE_ENV !== 'production',
 });
 
 const aiLimiter = rateLimit({
@@ -97,6 +98,7 @@ const aiLimiter = rateLimit({
   message: { message: 'Too many AI requests, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.DISABLE_RATE_LIMITS === 'true' || process.env.NODE_ENV !== 'production',
 });
 
 app.use('/api/auth', authLimiter, authRoutes);

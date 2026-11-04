@@ -1,4 +1,5 @@
-const { registerUser, loginUser, refreshUserSession } = require('./auth.service');
+const { registerUser, loginUser, refreshUserSession, createPasswordReset, resetPassword } = require('./auth.service');
+const { sendPasswordResetEmail } = require('./email.service');
 
 const refreshCookieOptions = {
   httpOnly: true,
@@ -57,4 +58,30 @@ const logout = (req, res) => {
   res.status(204).send();
 };
 
-module.exports = { register, login, refresh, logout };
+const forgotPassword = async (req, res) => {
+  const genericMessage = 'If an account matches that email, a reset link is on its way.';
+  try {
+    const reset = await createPasswordReset(req.body?.email);
+    if (reset) {
+      const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').split(',')[0].trim();
+      const resetUrl = `${clientUrl}/reset-password?token=${encodeURIComponent(reset.rawToken)}`;
+      await sendPasswordResetEmail({ email: reset.user.email, name: reset.user.name, resetUrl });
+      if (process.env.NODE_ENV === 'test') return res.status(200).json({ message: genericMessage, resetToken: reset.rawToken });
+    }
+    return res.status(200).json({ message: genericMessage });
+  } catch (err) {
+    console.error('Password reset request failed:', err.message);
+    return res.status(200).json({ message: genericMessage });
+  }
+};
+
+const completePasswordReset = async (req, res) => {
+  try {
+    await resetPassword({ token: req.body?.token, password: req.body?.password });
+    return res.status(200).json({ message: 'Password updated. You can now sign in.' });
+  } catch (err) {
+    return res.status(err.statusCode || 400).json({ message: err.message || 'Password could not be reset' });
+  }
+};
+
+module.exports = { register, login, refresh, logout, forgotPassword, completePasswordReset };

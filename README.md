@@ -20,8 +20,9 @@ Create profile → discover or host a trip → compare compatibility
 
 ## Implemented capabilities
 
-- Responsive cinematic landing page with a lazy-loaded interactive route globe and accessible SVG fallback
-- Registration, login, refresh sessions, logout, and protected routes
+- Responsive cinematic landing page with a lazy-loaded interactive route globe, transport motion, and accessible SVG fallback
+- Editorial destination artwork, animated train/bus/flight cues, and live trip-card previews
+- Registration, login, refresh sessions, logout, password recovery, and protected routes
 - Traveler profiles and matching preferences
 - Trip creation, discovery, filtering, sorting, and pagination
 - Explainable compatibility matching with Top-K heap ranking

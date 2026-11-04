@@ -1,4 +1,6 @@
 require('dotenv').config();
+process.env.NODE_ENV = 'test';
+process.env.DISABLE_RATE_LIMITS = 'true';
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
 

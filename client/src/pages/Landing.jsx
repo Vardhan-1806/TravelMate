@@ -9,6 +9,7 @@ import RouteMotif from '../components/RouteMotif';
 import SectionLabel from '../components/SectionLabel';
 import TravelBackdrop from '../components/TravelBackdrop';
 import GlobeFallback from '../components/scene/GlobeFallback';
+import DestinationArtwork from '../components/DestinationArtwork';
 
 const TravelGlobe = lazy(() => import('../components/scene/TravelGlobe'));
 
@@ -54,6 +55,20 @@ const FeatureCard = ({ number, title, description, accent = 'teal' }) => (
     <p className="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">{description}</p>
     <div className="absolute -bottom-10 -right-8 h-28 w-28 rounded-full border border-[var(--color-border)] opacity-50 transition-transform duration-500 group-hover:scale-150" />
   </motion.article>
+);
+
+const JourneyRail = () => (
+  <section className="journey-strip px-5 py-8 md:px-10">
+    <div className="relative mx-auto grid max-w-7xl gap-5 md:grid-cols-[.7fr_1fr_1fr_1fr] md:items-center">
+      <div className="pr-4"><p className="eyebrow">Routes in motion</p><p className="mt-3 max-w-[13rem] font-display text-2xl leading-tight text-[var(--color-accent)]">Every trip starts as a line on a map.</p></div>
+      {[['Goa', 'Flight'], ['Manali', 'Train'], ['Hampi', 'Bus']].map(([destination, transport]) => (
+        <Link key={destination} to={`/discover?destination=${destination}`} className="group relative h-28 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
+          <DestinationArtwork destination={destination} transport={transport} />
+          <span className="absolute bottom-3 left-4 z-10 text-xs font-bold text-white">Explore {destination} <span className="ml-1 opacity-60">↗</span></span>
+        </Link>
+      ))}
+    </div>
+  </section>
 );
 
 const Landing = () => {
@@ -103,7 +118,9 @@ const Landing = () => {
               </motion.div>
             </div>
             <div className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 items-center gap-3 text-[10px] font-bold uppercase tracking-[.2em] text-[var(--color-text-muted)] md:flex"><span className="h-px w-10 bg-current" />Scroll to explore<span className="h-px w-10 bg-current" /></div>
-          </section>
+           </section>
+
+          <JourneyRail />
 
           <section className="px-5 py-24 md:px-10 md:py-32">
             <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-end">

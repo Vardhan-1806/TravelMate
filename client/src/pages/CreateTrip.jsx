@@ -7,6 +7,7 @@ import PageTransition from '../components/PageTransition';
 import Input from '../components/Input';
 import { useAuth } from '../context/AuthContext';
 import SectionLabel from '../components/SectionLabel';
+import DestinationArtwork from '../components/DestinationArtwork';
 
 const TRIP_STYLES = [
   'Backpacker',
@@ -130,7 +131,7 @@ const CreateTrip = () => {
       <div className="min-h-screen bg-[var(--color-bg-primary)]">
         <Navbar />
 
-        <div className="max-w-3xl mx-auto px-6 py-10">
+        <div className="mx-auto max-w-6xl px-5 py-10 md:px-8 md:py-14">
           <div className="mb-8">
             <Link to="/discover" className="text-xs font-semibold text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)]">
               &larr; Back to discover
@@ -144,6 +145,7 @@ const CreateTrip = () => {
             </p>
           </div>
 
+          <div className="grid gap-6 lg:grid-cols-[1fr_.38fr] lg:items-start">
           <form onSubmit={handleSubmit} className="space-y-7 rounded-3xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-5 shadow-xl shadow-black/5 md:p-8">
             {error && (
               <div className="p-3 text-sm rounded-lg bg-[var(--color-danger)]/10 text-[var(--color-danger)] border border-[var(--color-danger)]/20">
@@ -326,6 +328,13 @@ const CreateTrip = () => {
               {mutation.isPending ? 'Publishing Trip...' : 'Publish Trip & Find Travelers'}
             </button>
           </form>
+          <aside className="lg:sticky lg:top-24">
+            <div className="overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-xl shadow-black/5">
+              <div className="h-56"><DestinationArtwork destination={form.destination || 'Goa'} transport={form.transport} /></div>
+              <div className="p-5"><p className="text-xs font-bold uppercase tracking-[.16em] text-[var(--color-coral)]">Live trip preview</p><h2 className="mt-3 font-display text-3xl leading-tight text-[var(--color-accent)]">{form.title || 'Your next shared journey'}</h2><p className="mt-3 text-sm leading-6 text-[var(--color-text-secondary)]">{form.source || 'Your city'} → {form.destination || 'A place worth going'}.</p><div className="mt-5 editorial-rule" /><p className="mt-4 text-xs leading-5 text-[var(--color-text-muted)]">A clear route, a thoughtful description, and the right travel style help compatible people find you.</p></div>
+            </div>
+          </aside>
+          </div>
         </div>
       </div>
     </PageTransition>

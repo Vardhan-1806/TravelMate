@@ -57,4 +57,35 @@ describe('Authentication', () => {
     const res = await request(app).get('/api/profile/me');
     expect(res.status).toBe(401);
   });
+
+  test('creates a single-use password reset token and updates the password', async () => {
+    await request(app).post('/api/auth/register').send({
+      name: 'Reset User', email: 'reset@example.com', password: 'OldPassword123',
+    });
+
+    const forgot = await request(app).post('/api/auth/forgot-password').send({ email: 'reset@example.com' });
+    expect(forgot.status).toBe(200);
+    expect(forgot.body.resetToken).toBeDefined();
+
+    const reset = await request(app).post('/api/auth/reset-password').send({
+      token: forgot.body.resetToken, password: 'NewPassword123',
+    });
+    expect(reset.status).toBe(200);
+
+    const login = await request(app).post('/api/auth/login').send({
+      email: 'reset@example.com', password: 'NewPassword123',
+    });
+    expect(login.status).toBe(200);
+
+    const reused = await request(app).post('/api/auth/reset-password').send({
+      token: forgot.body.resetToken, password: 'AnotherPassword123',
+    });
+    expect(reused.status).toBe(400);
+  });
+
+  test('does not reveal whether a reset email exists', async () => {
+    const res = await request(app).post('/api/auth/forgot-password').send({ email: 'unknown@example.com' });
+    expect(res.status).toBe(200);
+    expect(res.body.message).toContain('If an account matches');
+  });
 });

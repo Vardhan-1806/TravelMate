@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const User = require('./user.model');
+
+const RESET_TOKEN_TTL_MS = 15 * 60 * 1000;
 
 const registerUser = async ({ name, email, password }) => {
    if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
@@ -117,4 +120,37 @@ const refreshUserSession = async (refreshToken) => {
   };
 };
 
-module.exports = { registerUser, loginUser, refreshUserSession };
+const createPasswordReset = async (email) => {
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+  const user = await User.findOne({ email: normalizedEmail }).select('+resetPasswordToken +resetPasswordExpires');
+  if (!user) return null;
+
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  user.resetPasswordToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+  user.resetPasswordExpires = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+  await user.save();
+  return { user, rawToken };
+};
+
+const resetPassword = async ({ token, password }) => {
+  if (typeof token !== 'string' || !token || typeof password !== 'string' || password.length < 8 || password.length > 128) {
+    const error = new Error('Please provide a valid reset link and a password between 8 and 128 characters');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+  const user = await User.findOne({ resetPasswordToken: hashedToken, resetPasswordExpires: { $gt: new Date() } }).select('+resetPasswordToken +resetPasswordExpires');
+  if (!user) {
+    const error = new Error('This password reset link is invalid or has expired');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  user.password = await bcrypt.hash(password, 10);
+  user.resetPasswordToken = null;
+  user.resetPasswordExpires = null;
+  await user.save();
+};
+
+module.exports = { registerUser, loginUser, refreshUserSession, createPasswordReset, resetPassword };

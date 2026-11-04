@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { fetchNotifications, markNotificationRead, respondToJoinRequest } from '../api/dashboard';
 import Navbar from '../components/Navbar';
 import PageTransition from '../components/PageTransition';
+import SectionLabel from '../components/SectionLabel';
 
 const TABS = ['Notifications', 'Requests to review'];
 
@@ -31,8 +32,14 @@ const Dashboard = () => {
       <div className="min-h-screen bg-[var(--color-bg-primary)]">
         <Navbar />
 
-        <div className="max-w-3xl mx-auto px-6 py-10">
-          <h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">Your dashboard</h1>
+        <main className="mx-auto max-w-5xl px-5 py-10 md:px-8 md:py-16">
+          <div className="dashboard-hero rounded-[2rem] border border-[var(--color-border)] p-6 md:p-9">
+            <div className="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              <div><SectionLabel>Your travel desk</SectionLabel><h1 className="mt-5 font-display text-5xl leading-none text-[var(--color-accent)] md:text-6xl">Keep the journey moving.</h1><p className="mt-4 max-w-xl text-sm leading-7 text-[var(--color-text-secondary)]">Requests, decisions, and the next small step—kept together so your trips feel lighter.</p></div>
+              <Link to="/discover" className="button-lift inline-flex rounded-xl bg-[var(--color-coral)] px-5 py-3 text-sm font-bold text-white">Find another journey ↗</Link>
+            </div>
+            <div className="relative z-10 mt-8 grid max-w-xl grid-cols-3 gap-3"><div className="dashboard-stat"><strong>{notifications?.length ?? '—'}</strong><span>signals</span></div><div className="dashboard-stat"><strong>{joinRequestNotifs.length}</strong><span>requests</span></div><div className="dashboard-stat"><strong>24/7</strong><span>your pace</span></div></div>
+          </div>
 
           <div className="flex gap-1 mt-6 border-b border-[var(--color-border)]">
             {TABS.map((tab, i) => (
@@ -126,7 +133,7 @@ const Dashboard = () => {
               )}
             </AnimatePresence>
           </div>
-        </div>
+        </main>
       </div>
     </PageTransition>
   );

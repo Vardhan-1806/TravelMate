@@ -6,6 +6,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 const Landing = lazy(() => import('./pages/Landing'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Discover = lazy(() => import('./pages/Discover'));
 const TripDetail = lazy(() => import('./pages/TripDetail'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -34,6 +36,8 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/discover" element={<Discover />} />
           <Route path="/trips/:tripId" element={<TripDetail />} />
           <Route element={<ProtectedRoute />}>

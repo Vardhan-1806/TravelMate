@@ -35,6 +35,8 @@ GEMINI_API_KEY=...
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
+RESEND_API_KEY=...
+MAIL_FROM=TravelMate <no-reply@yourdomain.com>
 ```
 
 Use unique secrets for production. Store them only in the hosting provider's secret manager.
@@ -51,6 +53,7 @@ Use unique secrets for production. Store them only in the hosting provider's sec
 8. Verify `/api/health` after deployment.
 9. Test login, refresh, Socket.IO connection, trip creation, and a protected workspace.
 10. Confirm logs do not contain tokens, passwords, or full request bodies.
+11. Send a real password-reset email and verify the link expires after 15 minutes and cannot be reused.
 
 ## CI recommendation
 

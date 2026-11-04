@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { CalendarIcon, WalletIcon, TransportIcon } from '../components/Icons';
 import CompatibilityRing from '../components/CompatibilityRing';
 import SectionLabel from '../components/SectionLabel';
+import DestinationArtwork from '../components/DestinationArtwork';
 
 const Matches = () => {
   const { user } = useAuth();
@@ -100,9 +101,12 @@ const Matches = () => {
                     key={tripId}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-6 rounded-2xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] shadow-sm hover:border-[var(--color-accent)]/40 transition-all"
+                    className="overflow-hidden rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-bg-elevated)] shadow-sm transition-all hover:border-[var(--color-accent)]/40"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div className="grid gap-0 md:grid-cols-[.42fr_1fr]">
+                      <div className="h-48 md:h-full"><DestinationArtwork destination={trip.destination} transport={trip.transport} /></div>
+                      <div className="p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-semibold text-[var(--color-accent)] tracking-wide">
@@ -170,6 +174,8 @@ const Matches = () => {
                       >
                         View Trip &rarr;
                       </Link>
+                    </div>
+                    </div>
                     </div>
                   </motion.div>
                 );
